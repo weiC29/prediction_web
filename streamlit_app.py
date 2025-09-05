@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import gspread
-from oauth2client.service_account import ServiceAccountCredentials
+from google.oauth2.service_account import Credentials
 from datetime import datetime, timedelta
 import random
 import io
@@ -65,10 +65,12 @@ DISPLAY_ORDER = [
 
 @st.cache_resource
 def get_ws():
-    scope = ["https://spreadsheets.google.com/feeds",
-             "https://www.googleapis.com/auth/drive"]
-    creds = ServiceAccountCredentials.from_json_keyfile_dict(
-        st.secrets["gcp_service_account"], scope
+    scope = [
+        "https://www.googleapis.com/auth/spreadsheets",
+        "https://www.googleapis.com/auth/drive",
+    ]
+    creds = Credentials.from_service_account_info(
+        st.secrets["gcp_service_account"], scopes=scope
     )
     gc = gspread.authorize(creds)
     return gc.open_by_key(st.secrets["SHEET_ID"]).worksheet(TAB_NAME)
